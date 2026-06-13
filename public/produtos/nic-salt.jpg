@@ -1064,4 +1064,187 @@ if (window!=window.top) {
       padding: 0 1.5rem;
     }
 
-    .wayback-slider-1 h4.way
+    .wayback-slider-1 h4.wayback-slider {
+      margin-top: 0;
+      font: normal 100 1.6rem 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    .wayback-slider-1 .grid.wayback-slider {
+      display: grid;
+      grid-template-columns: minmax(auto, 260px) 1fr minmax(auto, 260px);
+
+      grid-column-gap: 2.5rem;
+    }
+
+    .wayback-slider-1 .link-lists.wayback-slider {
+      display: grid;
+      grid-template-columns: calc(50% - 1.25rem) calc(50% - 1.25rem);
+      grid-column-gap: 2.5rem;
+    }
+
+  }
+</style><!-- Shady DOM styles for more-slider -->
+<style scope="more-slider-1">
+  .more-slider-1 ul.more-slider {
+    padding: 0;
+    margin: -1rem 0 0 0;
+    list-style: none;
+  }
+
+  .more-slider-1 a.more-slider {
+    display: block;
+    padding: 1rem 0;
+    text-decoration: none;
+    color: #fff;
+  }
+</style><!-- Shady DOM styles for media-subnav -->
+<style scope="media-subnav-1">
+  .media-subnav-1 h4.media-subnav {
+    font-size: 1.6rem;
+  }
+
+  .media-subnav-1 a.media-subnav {
+    text-decoration: none;
+    color: #fff;
+  }
+
+  .media-subnav-1 ul.media-subnav {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .media-subnav-1 li.media-subnav+li.media-subnav {
+    padding-top: 1.5rem;
+  }
+
+  @media (min-width: 890px) {
+    .media-subnav-1 h4.media-subnav {
+      margin: 0 0 1rem 0;
+      font-weight: 100;
+    }
+
+    .media-subnav-1 ul.media-subnav {
+      font-size: 1.3rem;
+    }
+
+    .media-subnav-1 li.media-subnav {
+      padding-bottom: .5rem;
+    }
+
+    .media-subnav-1 li.media-subnav+li.media-subnav {
+      padding-top: 0;
+    }
+
+    .media-subnav-1 li.media-subnav a.media-subnav {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+  }
+
+  .media-subnav-1 img.media-subnav {
+    display: block;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 1rem auto;
+    border-radius: 45px;
+  }
+
+  .media-subnav-1 h3.media-subnav {
+    margin-top: 0;
+    font-size: 1.8rem;
+  }
+
+  .media-subnav-1 .icon-links.media-subnav {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: space-evenly;
+    -ms-flex-pack: space-evenly;
+    justify-content: space-evenly;
+    text-align: center;
+  }
+
+  .media-subnav-1 .icon-links.media-subnav a.media-subnav {
+    display: inline-block;
+    width: 12rem;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    text-overflow: ellipsis;
+  }
+
+  .media-subnav-1 .icon-links.media-subnav a.media-subnav+a.media-subnav {
+    margin-left: 2rem;
+  }
+
+  .media-subnav-1 .featured.media-subnav h4.media-subnav {
+    display: none;
+  }
+
+  @media (min-width: 890px) {
+    .media-subnav-1 {
+      display: -ms-grid;
+      display: grid;
+      -ms-grid-columns: 40% 20% 40%;
+      grid-template-columns: 40% 20% 40%;
+    }
+
+    .media-subnav-1 .wayback-search.media-subnav {
+      -ms-grid-column: 1;
+      -ms-grid-column-span: 3;
+      grid-column: 1 / 4;
+    }
+
+    .media-subnav-1 h3.media-subnav {
+      display: none;
+    }
+
+    .media-subnav-1 .icon-links.media-subnav {
+      -ms-grid-column: 1;
+    }
+
+    .media-subnav-1 .icon-links.media-subnav a.media-subnav {
+      padding-top: 3.5rem;
+      max-width: 16rem;
+    }
+
+    .media-subnav-1 .links.media-subnav {
+      padding: 0 1.5rem;
+    }
+
+    .media-subnav-1 .featured.media-subnav {
+      -ms-grid-column: 2;
+    }
+
+    .media-subnav-1 .featured.media-subnav h4.media-subnav {
+      display: block;
+    }
+
+    .media-subnav-1 .top.media-subnav {
+      -ms-grid-column: 3;
+    }
+
+    .media-subnav-1 .top.media-subnav ul.media-subnav {
+      display: -ms-grid;
+      display: grid;
+      -ms-grid-columns: 50% 3rem 50%;
+      grid-template-columns: 50% 50%;
+      -ms-grid-rows: (auto)[7];
+      grid-template-rows: repeat(7, auto);
+      grid-column-gap: 3rem;
+      grid-auto-flow: column;
+    }
+
+    .media-subnav-1 .top.media-subnav ul.media-subnav>*.media-subnav:nth-child(1) {
+      -ms-grid-row: 1;
+      -ms-grid-column: 1;
+    }
+
+    .media-subnav-1 .top.media-subnav ul.media-subnav>*.media-subnav:nth-child(2) {
+      -ms-grid-row: 2;
+   

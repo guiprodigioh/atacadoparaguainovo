@@ -7,7 +7,7 @@ const A = 'https://web.archive.org/web/20250311085710im_/https://atacadoparaguai
 
 const currencies = [
   { code: 'USD', label: 'Dólar', flag: `${A}/2025/01/002-united-states-1.png`, rate: 1 },
-  { code: 'BRL', label: 'Real', flag: `${A}/2025/01/001-brazil-1.png`, rate: 5.91 },
+  { code: 'BRL', label: 'Real', flag: `${A}/2025/01/001-brazil-1.png`, rate: 5.20 },
   { code: 'PYG', label: 'Guarani', flag: `${A}/2025/01/003-paraguai-1.png`, rate: 7680 },
 ]
 
@@ -113,7 +113,7 @@ export default function Home() {
 
       {/* Top bar */}
       <div className="bg-[#111] py-1.5 px-4 text-xs flex justify-between items-center border-b border-[#2a2a2a]">
-        <span className="text-gray-500">USD/BRL = 5.91 &nbsp;|&nbsp; USD/PYG = 7.680</span>
+        <span className="text-gray-500">USD/BRL = 5,20 &nbsp;|&nbsp; USD/PYG = 7.680</span>
         <div className="flex items-center gap-3">
           {currencies.map(c => (
             <button
