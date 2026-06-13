@@ -103,7 +103,7 @@ export default function Home() {
       {/* Header */}
       <header className="bg-[#212121] sticky top-0 z-50 border-b border-[#2e2e2e]">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <Image src={`${A}/2024/11/atacado-paraguai-logo.png`} alt="Atacado Paraguai" width={150} height={59} className="object-contain" unoptimized />
+          <Image src="/logo.png" alt="Atacado Paraguai" width={150} height={59} className="object-contain" />
 
           <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
             <a href="#" className="px-3 py-1.5 hover:text-[#12fd00] transition-colors">Home</a>
@@ -264,7 +264,7 @@ export default function Home() {
       <footer className="bg-[#111] border-t border-[#222] py-12 px-4">
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
           <div>
-            <Image src={`${A}/2024/11/atacado-paraguai-logo.png`} alt="Atacado Paraguai" width={140} height={55} className="object-contain mb-4" unoptimized />
+            <Image src="/logo-light.png" alt="Atacado Paraguai" width={160} height={63} className="object-contain mb-4" />
             <p className="text-sm text-gray-500 leading-relaxed">Atacado e varejo. Compre e retire na loja em Paraguai.</p>
           </div>
           <div>
