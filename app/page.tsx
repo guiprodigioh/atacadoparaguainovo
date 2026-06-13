@@ -28,30 +28,60 @@ const categories = [
   { name: 'Líquidos', count: 1, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, hot: false },
 ]
 
+const SP = 'https://tapsknrszmfhuwzvovem.supabase.co/storage/v1/object/public/conectapy/produtos'
+
 type Product = { name: string; usd: number; img: string; variants: boolean; brand?: string }
 
 const peptideos: Product[] = [
-  { name: 'Retatrutide 40mg', usd: 60, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'Wolverine Blend BPC157 + TB500 20mg', usd: 50, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'Selank 10mg', usd: 50, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'NAD+ 1000mg', usd: 60, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'Tirzepatida 75mg — 01 Pen', usd: 150, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'ZPHC' },
-  { name: 'Tirzepatida 150mg', usd: 210, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'ZPHC' },
-  { name: 'Retatrutide 120mg — 02 Vials', usd: 270, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'ZPHC' },
-  { name: 'Semaglutide 05mg', usd: 50, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'ZPHC' },
-  { name: 'Somatropin GH 02ml (50 UI) — 05 Vials', usd: 85, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Muscle' },
-  { name: 'Primobolan 100mg 10ml', usd: 32, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Muscle' },
-  { name: 'Tirzepatide T.G 15mg / 0,5ml', usd: 84, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: true, brand: 'Indufar' },
-  { name: 'Healthcare BPC157 & TB500 40mg — Pen', usd: 95, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Alluvi' },
-  { name: 'GHK-Cu 100mg — Pen', usd: 90, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Oxygen' },
-  { name: 'Retatrutide 40mg — Pen', usd: 80, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'Tirzepatida 15mg — 04 Vials', usd: 73, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Lipoless' },
-  { name: 'Mounjaro Kwikpen 10mg', usd: 300, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Mounjaro' },
-  { name: 'Água Bacteriostática 03ml — Pack 10 Vials', usd: 20, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Água Bact.' },
-  { name: 'Decabolic (Nandrolone Decanoate) 250mg', usd: 35, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false, brand: 'Cooper Pharma' },
+  { name: 'Retatrutide 40mg', usd: 60, img: `${SP}/biogenesis-retatrutide-40mg.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'Wolverine Blend BPC-157 + TB-500 20mg', usd: 50, img: `${SP}/biogenesis-tb-500-10mg.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'Selank 10mg', usd: 50, img: `${SP}/biogenesis-semax-10mg.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'NAD+ 1000mg', usd: 60, img: `${SP}/biogenesis-ghk-cu-100mg-migrado.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'BPC-157 10mg', usd: 35, img: `${SP}/bpc-157-5mg-1.png`, variants: false, brand: 'Biogenesis' },
+  { name: 'PT-141 10mg', usd: 35, img: `${SP}/biogenesis-pt-141-10mg.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'Ipamorelin 10mg', usd: 40, img: `${SP}/biogenesis-aod-9604-10mg.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'SS-31 50mg', usd: 55, img: `${SP}/biogenesis-ss-31-10mg.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'GHK-Cu 100mg', usd: 35, img: `${SP}/biogenesis-ghk-cu-100mg-migrado.jpg`, variants: false, brand: 'Biogenesis' },
+  { name: 'Tirzepatida 75mg — 01 Pen', usd: 150, img: `${SP}/zphc-semaglutide-05mg-migrado.jpg`, variants: false, brand: 'ZPHC' },
+  { name: 'Tirzepatida 150mg', usd: 210, img: `${SP}/zphc-semaglutide-05mg-migrado.jpg`, variants: false, brand: 'ZPHC' },
+  { name: 'Retatrutide 120mg — 02 Vials', usd: 270, img: `${SP}/reta-zphc-120mg-1780748342000.png`, variants: false, brand: 'ZPHC' },
+  { name: 'Retatrutide 40mg', usd: 60, img: `${SP}/zphc-40mg-1.png`, variants: false, brand: 'ZPHC' },
+  { name: 'Retatrutide 60mg', usd: 60, img: `${SP}/zphc-60mg-1.png`, variants: false, brand: 'ZPHC' },
+  { name: 'Semaglutide 05mg', usd: 50, img: `${SP}/zphc-semaglutide-05mg-migrado.jpg`, variants: false, brand: 'ZPHC' },
+  { name: 'Tirzepatide T.G 15mg / 0,5ml', usd: 84, img: `${SP}/tg-15mg-1.png`, variants: false, brand: 'Indufar' },
+  { name: 'Healthcare BPC-157 + TB-500 40mg — Pen', usd: 95, img: `${SP}/alluvi-healthcare-bpc-157-tb-500-40mg-caneta-1779546136380.jpg`, variants: false, brand: 'Alluvi' },
+  { name: 'Healthcare Glow GHK-Cu 50mg — Pen', usd: 95, img: `${SP}/alluvi-glow-ghk-cu-50mg-pen-2.png`, variants: false, brand: 'Alluvi' },
+  { name: 'GHK-Cu 100mg — Pen', usd: 90, img: `${SP}/oxygen-ghk-cu-100mg-pen.jpeg`, variants: false, brand: 'Oxygen' },
+  { name: 'GHK-Cu 100mg — Vial', usd: 50, img: `${SP}/oxygen-ghk-cu-100mg-vial-real.jpg`, variants: false, brand: 'Oxygen' },
+  { name: 'Klow 80mg — Pen', usd: 90, img: `${SP}/oxygen-klow-80mg-caneta-1780547405382.png`, variants: false, brand: 'Oxygen' },
+  { name: 'Klow 80mg — Vial', usd: 70, img: `${SP}/biogenesis-klow-80mg.jpg`, variants: false, brand: 'Oxygen' },
+  { name: 'NAD+ 1000mg + B12 — Pen', usd: 90, img: `${SP}/oxygen-nad-b12-migrado.webp`, variants: false, brand: 'Oxygen' },
+  { name: 'Glow 70mg — Pen', usd: 95, img: `${SP}/oxygen-glow-70mg-pen.png`, variants: false, brand: 'Oxygen' },
+  { name: 'DSIP 05mg — Vial', usd: 60, img: `${SP}/oxygen-ghk-cu-100mg-vial-real.jpg`, variants: false, brand: 'Oxygen' },
+  { name: 'Retatrutide 40mg — Pen', usd: 80, img: `${SP}/thera-genetics-retatrutide-40mg-pen-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
+  { name: 'Klow 80mg — Pen', usd: 95, img: `${SP}/thera-genetics-retatrutide-40mg-pen-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
+  { name: 'GHK-Cu 50mg', usd: 55, img: `${SP}/thera-genetics-ghk-cu-50mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
+  { name: 'TB-500 10mg', usd: 65, img: `${SP}/thera-genetics-tb-500-10mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
+  { name: 'Epithalon 40mg', usd: 65, img: `${SP}/thera-genetics-epithalon-40mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
+  { name: 'PT-141 10mg', usd: 40, img: `${SP}/thera-genetics-pt-141-10mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
+  { name: 'BPC-157 10mg', usd: 55, img: `${SP}/thera-genetics-bpc-157-10mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
+  { name: 'Tirzepatide 15mg — 04 Vials', usd: 80, img: `${SP}/thera-genetics-tirzepatide-15mg-x4-migrado.png`, variants: false, brand: 'Thera Genetics' },
+  { name: 'Retatrutide 40mg — Pen', usd: 85, img: `${SP}/retatrutide-synedica-40mg-migrado.png`, variants: false, brand: 'Synedica' },
+  { name: 'Tirzepatida 15mg — 04 Vials (1ª Geração)', usd: 73, img: `${SP}/lipoless-md-15mg-1779716638438.png`, variants: false, brand: 'Lipoless' },
+  { name: 'Tirzepatida 15mg / 0,6ml — 01 Vial', usd: 75, img: `${SP}/lipoless-md-15mg-1779716638438.png`, variants: false, brand: 'Lipoless' },
+  { name: 'Tirzepatida 15mg / 0,5ml', usd: 75, img: `${SP}/lipoland-15mg-1.png`, variants: false, brand: 'Lipoland' },
+  { name: 'Mounjaro KwikPen 10mg', usd: 300, img: `${SP}/tnl-tirzepatide-60mg-true-north-labs-1780547705089.png`, variants: false, brand: 'Mounjaro' },
+  { name: 'Retatrutide 12mg — 04 Vials', usd: 75, img: `${SP}/tnl-retratutide-true-north-40mg03ml-pen-migrado.jpg`, variants: false, brand: 'TNL True North' },
+  { name: 'Retatrutide 48mg — Pen', usd: 85, img: `${SP}/tnl-retratutide-true-north-40mg03ml-pen-migrado.jpg`, variants: false, brand: 'TNL True North' },
+  { name: 'Tirzepatide 15mg — 04 Vials', usd: 55, img: `${SP}/tnl-tirzepatide-60mg-true-north-labs-1780547705089.png`, variants: false, brand: 'TNL True North' },
+  { name: 'Decabolic (Nandrolone Decanoate) 250mg', usd: 35, img: `${SP}/cooper-masterbolic-drostanolona-100mg-17806681703N.png`, variants: false, brand: 'Cooper Pharma' },
+  { name: 'Masterbolic (Drostanolona Propionato) 100mg', usd: 55, img: `${SP}/cooper-masterbolic-drostanolona-100mg-17806681703N.png`, variants: false, brand: 'Cooper Pharma' },
+  { name: 'Água Bacteriostática 03ml — Pack 10 Vials', usd: 20, img: `${SP}/-gua-bacteriost-tica-3ml-pack-10-unidades-1780547478042.png`, variants: false, brand: 'Água Bact.' },
+  { name: 'ISRADERM 150 UI', usd: 43, img: `${SP}/israderm-150-ui-migrado.jpeg`, variants: false, brand: 'Hormonas' },
+  { name: 'ISRADERM 100 UI', usd: 35, img: `${SP}/israderm-100-ui-migrado.jpeg`, variants: false, brand: 'Hormonas' },
 ]
 
-const brands = ['Todos', 'Biogenesis', 'ZPHC', 'Muscle', 'Indufar', 'Alluvi', 'Oxygen', 'Thera Genetics', 'Lipoless', 'Mounjaro', 'Cooper Pharma']
+const brands = ['Todos', 'Biogenesis', 'ZPHC', 'Indufar', 'Alluvi', 'Oxygen', 'Thera Genetics', 'Synedica', 'Lipoless', 'Lipoland', 'Mounjaro', 'TNL True North', 'Cooper Pharma', 'Hormonas', 'Água Bact.']
 
 const products = [
   { name: 'Cartucho Elfbar EW9000', usd: 6.00, img: `${A}/2024/12/elfbar.jpg`, variants: true },
@@ -230,8 +260,8 @@ export default function Home() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {peptideos.filter(p => activeBrand === 'Todos' || p.brand === activeBrand).map((p, i) => (
             <div key={i} className="bg-[#242424] border border-[#333] rounded-xl overflow-hidden hover:border-[#12fd00] transition-colors group">
-              <div className="relative h-40 bg-[#1a1a1a] flex items-center justify-center">
-                <div className="text-5xl">💉</div>
+              <div className="relative h-40 bg-[#1a1a1a]">
+                <Image src={p.img} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
                 {p.brand && (
                   <span className="absolute top-2 left-2 bg-[#2a2a2a] border border-[#444] text-[10px] text-gray-400 px-2 py-0.5 rounded">{p.brand}</span>
                 )}
