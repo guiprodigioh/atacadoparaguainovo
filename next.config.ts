@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "tapsknrszmfhuwzvovem.supabase.co" },
       { protocol: "https", hostname: "atacadoparaguai.com" },
       { protocol: "https", hostname: "assets.olaclick.app" },
+      { protocol: "https", hostname: "xjmapfpfgwoivlsalltb.supabase.co" },
       { protocol: "https", hostname: "flagcdn.com" },
     ],
   },
