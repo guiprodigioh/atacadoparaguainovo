@@ -2,94 +2,74 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useCarrinho, currencies } from '@/components/CarrinhoContext'
+import { getSupabaseClient } from '@/lib/supabase-client'
 
-const A = 'https://web.archive.org/web/20250311085710im_/https://atacadoparaguai.com/wp-content/uploads'
-
-const currencies = [
-  { code: 'USD', label: 'Dólar', flag: `${A}/2025/01/002-united-states-1.png`, rate: 1 },
-  { code: 'BRL', label: 'Real', flag: `${A}/2025/01/001-brazil-1.png`, rate: 5.20 },
-  { code: 'PYG', label: 'Guarani', flag: `${A}/2025/01/003-paraguai-1.png`, rate: 7680 },
+const navLinks = [
+  { label: 'HOME', href: '#' },
+  { label: 'SAÚDE', href: '#saude' },
+  { label: 'ATACADO', href: '#saude' },
+  { label: 'CONTATO', href: 'https://wa.me/595984522822' },
 ]
 
-const navCategories = ['VER TUDO', 'Saúde', 'PODS', 'Perfumes Árabes', 'Líquidos', 'Acessórios']
+type Product = { id: string; name: string; brand: string | null; usd_price: number; img_url: string; estoque: number | null }
 
-const slides = [
-  { img: `${A}/2022/05/BannerIgnite.jpg`, tag: 'ATACADO E VAREJO', title: 'Conheça a linha Ignite', cta: 'VER MODELOS' },
-  { img: `${A}/2024/12/oxbar1.jpg`, tag: 'ATACADO E VAREJO', title: 'Oxbar 30.000 Puffs', cta: 'COMPRAR' },
-  { img: `${A}/2024/12/elfbar.jpg`, tag: 'ATACADO E VAREJO', title: 'Elfbar TE 30.000', cta: 'VER MODELOS' },
-  { img: `${A}/2024/12/perfume-2.jpg`, tag: 'Perfumes', title: 'Descubra nossa linha de perfumes árabes', cta: 'VER PRODUTOS' },
-]
-
-const categories = [
-  { name: 'Saúde', count: 60, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, hot: true },
-  { name: 'Descartável', count: 45, img: `${A}/2024/12/descartavel.png`, hot: false },
-  { name: 'Perfumes', count: 9, img: `${A}/2024/12/002-perfume.png`, hot: false },
-  { name: 'Acessórios', count: 2, img: `${A}/2025/01/acessorios.png`, hot: false },
-  { name: 'Líquidos', count: 1, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, hot: false },
-]
-
-const SP = 'https://tapsknrszmfhuwzvovem.supabase.co/storage/v1/object/public/conectapy/produtos'
-
-type Product = { name: string; usd: number; img: string; variants: boolean; brand?: string }
-
-const peptideos: Product[] = [
-  { name: 'Retatrutide 40mg', usd: 60, img: `${SP}/biogenesis-retatrutide-40mg.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'Wolverine Blend BPC-157 + TB-500 20mg', usd: 50, img: `${SP}/biogenesis-tb-500-10mg.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'Selank 10mg', usd: 50, img: `${SP}/biogenesis-semax-10mg.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'NAD+ 1000mg', usd: 60, img: `${SP}/biogenesis-ghk-cu-100mg-migrado.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'BPC-157 10mg', usd: 35, img: `${SP}/bpc-157-5mg-1.png`, variants: false, brand: 'Biogenesis' },
-  { name: 'PT-141 10mg', usd: 35, img: `${SP}/biogenesis-pt-141-10mg.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'Ipamorelin 10mg', usd: 40, img: `${SP}/biogenesis-aod-9604-10mg.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'SS-31 50mg', usd: 55, img: `${SP}/biogenesis-ss-31-10mg.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'GHK-Cu 100mg', usd: 35, img: `${SP}/biogenesis-ghk-cu-100mg-migrado.jpg`, variants: false, brand: 'Biogenesis' },
-  { name: 'Tirzepatida 75mg — 01 Pen', usd: 150, img: `${SP}/zphc-semaglutide-05mg-migrado.jpg`, variants: false, brand: 'ZPHC' },
-  { name: 'Tirzepatida 150mg', usd: 210, img: `${SP}/zphc-semaglutide-05mg-migrado.jpg`, variants: false, brand: 'ZPHC' },
-  { name: 'Retatrutide 120mg — 02 Vials', usd: 270, img: `${SP}/reta-zphc-120mg-1780748342000.png`, variants: false, brand: 'ZPHC' },
-  { name: 'Retatrutide 40mg', usd: 60, img: `${SP}/zphc-40mg-1.png`, variants: false, brand: 'ZPHC' },
-  { name: 'Retatrutide 60mg', usd: 60, img: `${SP}/zphc-60mg-1.png`, variants: false, brand: 'ZPHC' },
-  { name: 'Semaglutide 05mg', usd: 50, img: `${SP}/zphc-semaglutide-05mg-migrado.jpg`, variants: false, brand: 'ZPHC' },
-  { name: 'Tirzepatide T.G 15mg / 0,5ml', usd: 84, img: `${SP}/tg-15mg-1.png`, variants: false, brand: 'Indufar' },
-  { name: 'Healthcare BPC-157 + TB-500 40mg — Pen', usd: 95, img: `${SP}/alluvi-healthcare-bpc-157-tb-500-40mg-caneta-1779546136380.jpg`, variants: false, brand: 'Alluvi' },
-  { name: 'Healthcare Glow GHK-Cu 50mg — Pen', usd: 95, img: `${SP}/alluvi-glow-ghk-cu-50mg-pen-2.png`, variants: false, brand: 'Alluvi' },
-  { name: 'GHK-Cu 100mg — Pen', usd: 90, img: `${SP}/oxygen-ghk-cu-100mg-pen.jpeg`, variants: false, brand: 'Oxygen' },
-  { name: 'GHK-Cu 100mg — Vial', usd: 50, img: `${SP}/oxygen-ghk-cu-100mg-vial-real.jpg`, variants: false, brand: 'Oxygen' },
-  { name: 'Klow 80mg — Pen', usd: 90, img: `${SP}/oxygen-klow-80mg-caneta-1780547405382.png`, variants: false, brand: 'Oxygen' },
-  { name: 'Klow 80mg — Vial', usd: 70, img: `${SP}/biogenesis-klow-80mg.jpg`, variants: false, brand: 'Oxygen' },
-  { name: 'NAD+ 1000mg + B12 — Pen', usd: 90, img: `${SP}/oxygen-nad-b12-migrado.webp`, variants: false, brand: 'Oxygen' },
-  { name: 'Glow 70mg — Pen', usd: 95, img: `${SP}/oxygen-glow-70mg-pen.png`, variants: false, brand: 'Oxygen' },
-  { name: 'DSIP 05mg — Vial', usd: 60, img: `${SP}/oxygen-ghk-cu-100mg-vial-real.jpg`, variants: false, brand: 'Oxygen' },
-  { name: 'Retatrutide 40mg — Pen', usd: 80, img: `${SP}/thera-genetics-retatrutide-40mg-pen-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'Klow 80mg — Pen', usd: 95, img: `${SP}/thera-genetics-retatrutide-40mg-pen-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'GHK-Cu 50mg', usd: 55, img: `${SP}/thera-genetics-ghk-cu-50mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'TB-500 10mg', usd: 65, img: `${SP}/thera-genetics-tb-500-10mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'Epithalon 40mg', usd: 65, img: `${SP}/thera-genetics-epithalon-40mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'PT-141 10mg', usd: 40, img: `${SP}/thera-genetics-pt-141-10mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'BPC-157 10mg', usd: 55, img: `${SP}/thera-genetics-bpc-157-10mg-migrado.jpg`, variants: false, brand: 'Thera Genetics' },
-  { name: 'Tirzepatide 15mg — 04 Vials', usd: 80, img: `${SP}/thera-genetics-tirzepatide-15mg-x4-migrado.png`, variants: false, brand: 'Thera Genetics' },
-  { name: 'Retatrutide 40mg — Pen', usd: 85, img: `${SP}/retatrutide-synedica-40mg-migrado.png`, variants: false, brand: 'Synedica' },
-  { name: 'Tirzepatida 15mg — 04 Vials (1ª Geração)', usd: 73, img: `${SP}/lipoless-md-15mg-1779716638438.png`, variants: false, brand: 'Lipoless' },
-  { name: 'Tirzepatida 15mg / 0,6ml — 01 Vial', usd: 75, img: `${SP}/lipoless-md-15mg-1779716638438.png`, variants: false, brand: 'Lipoless' },
-  { name: 'Tirzepatida 15mg / 0,5ml', usd: 75, img: `${SP}/lipoland-15mg-1.png`, variants: false, brand: 'Lipoland' },
-  { name: 'Mounjaro KwikPen 10mg', usd: 300, img: `${SP}/tnl-tirzepatide-60mg-true-north-labs-1780547705089.png`, variants: false, brand: 'Mounjaro' },
-  { name: 'Retatrutide 12mg — 04 Vials', usd: 75, img: `${SP}/tnl-retratutide-true-north-40mg03ml-pen-migrado.jpg`, variants: false, brand: 'TNL True North' },
-  { name: 'Retatrutide 48mg — Pen', usd: 85, img: `${SP}/tnl-retratutide-true-north-40mg03ml-pen-migrado.jpg`, variants: false, brand: 'TNL True North' },
-  { name: 'Tirzepatide 15mg — 04 Vials', usd: 55, img: `${SP}/tnl-tirzepatide-60mg-true-north-labs-1780547705089.png`, variants: false, brand: 'TNL True North' },
-  { name: 'Decabolic (Nandrolone Decanoate) 250mg', usd: 35, img: `${SP}/cooper-masterbolic-drostanolona-100mg-17806681703N.png`, variants: false, brand: 'Cooper Pharma' },
-  { name: 'Masterbolic (Drostanolona Propionato) 100mg', usd: 55, img: `${SP}/cooper-masterbolic-drostanolona-100mg-17806681703N.png`, variants: false, brand: 'Cooper Pharma' },
-  { name: 'Água Bacteriostática 03ml — Pack 10 Vials', usd: 20, img: `${SP}/-gua-bacteriost-tica-3ml-pack-10-unidades-1780547478042.png`, variants: false, brand: 'Água Bact.' },
-  { name: 'ISRADERM 150 UI', usd: 43, img: `${SP}/israderm-150-ui-migrado.jpeg`, variants: false, brand: 'Hormonas' },
-  { name: 'ISRADERM 100 UI', usd: 35, img: `${SP}/israderm-100-ui-migrado.jpeg`, variants: false, brand: 'Hormonas' },
-]
-
-const brands = ['Todos', 'Biogenesis', 'ZPHC', 'Indufar', 'Alluvi', 'Oxygen', 'Thera Genetics', 'Synedica', 'Lipoless', 'Lipoland', 'Mounjaro', 'TNL True North', 'Cooper Pharma', 'Hormonas', 'Água Bact.']
-
-const products = [
-  { name: 'Cartucho Elfbar EW9000', usd: 6.00, img: `${A}/2024/12/elfbar.jpg`, variants: true },
-  { name: 'Cartucho Life Pod ECO II 10.000 Puffs', usd: 6.50, img: `${A}/2024/12/descartavel.png`, variants: true },
-  { name: 'Kit Life Pod ECO II', usd: 9.00, img: `${A}/2024/12/descartavel.png`, variants: true },
-  { name: 'Nic Salt Born To Vape 30ml (35mg)', usd: 6.00, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false },
-  { name: 'Nic Salt Born To Vape 30ml (50mg)', usd: 6.00, img: `${A}/2025/01/Born-Nic-Salt-30ml-scaled.jpg`, variants: false },
-  { name: 'Pod Elfbar EW9000 Kit Bateria + Cartucho', usd: 9.00, img: `${A}/2024/12/elfbar.jpg`, variants: true },
+const banners = [
+  {
+    tag: 'TECNOLOGIA BIOLÓGICA DE PONTA',
+    title: ['PEPTÍDEOS DE', 'ALTA PERFORMANCE'],
+    sub: 'Pureza farmacêutica. Importado direto. Resultados reais.',
+    cta: 'VER CATÁLOGO',
+    href: '#saude',
+    color: '#12fd00',
+    bg: 'radial-gradient(ellipse 90% 70% at 35% 50%, #002200 0%, #000d00 60%, #000 100%)',
+    productImg: 'https://assets.olaclick.app/companies/products/images/800/78a15da1-ca0f-4fea-8e07-48419b95482c.jpeg',
+    productLabel: 'BIOGENESIS RETATRUTIDE 40MG',
+    productPrice: 'USD 60',
+    rays: [
+      { rotate: -35, opacity: 0.7, delay: '0s' },
+      { rotate: -20, opacity: 0.35, delay: '0.3s' },
+      { rotate: -50, opacity: 0.45, delay: '0.6s' },
+      { rotate: 10, opacity: 0.25, delay: '1s' },
+    ],
+  },
+  {
+    tag: '54 PRODUTOS DISPONÍVEIS',
+    title: ['BIOGENESIS · ZPHC', 'THERA · TNL'],
+    sub: 'As maiores marcas do mercado em estoque. Atacado e varejo.',
+    cta: 'EXPLORAR MARCAS',
+    href: '#saude',
+    color: '#00e5ff',
+    bg: 'radial-gradient(ellipse 90% 70% at 35% 50%, #001a22 0%, #000810 60%, #000 100%)',
+    productImg: 'https://assets.olaclick.app/companies/products/images/800/43a04611-249c-4db5-9d1b-beafa314b533.png',
+    productLabel: 'ZPHC RETATRUTIDE 60MG PEN',
+    productPrice: 'USD 200',
+    rays: [
+      { rotate: 40, opacity: 0.6, delay: '0s' },
+      { rotate: 60, opacity: 0.3, delay: '0.4s' },
+      { rotate: 25, opacity: 0.4, delay: '0.8s' },
+      { rotate: -10, opacity: 0.25, delay: '1.2s' },
+    ],
+  },
+  {
+    tag: 'ATACADO PARAGUAI OFICIAL',
+    title: ['COMPRE DIRETO', 'DA FONTE'],
+    sub: 'Melhores preços em USD · Entrega para todo o Brasil',
+    cta: 'FAZER PEDIDO',
+    href: '#saude',
+    color: '#ff2cf7',
+    bg: 'radial-gradient(ellipse 90% 70% at 35% 50%, #220018 0%, #0d0008 60%, #000 100%)',
+    productImg: 'https://assets.olaclick.app/companies/products/images/800/70658994-2642-457d-8e2f-8a9b8e88d868.jpeg',
+    productLabel: 'THERA GLOW 70MG PEN',
+    productPrice: 'USD 95',
+    rays: [
+      { rotate: 15, opacity: 0.65, delay: '0s' },
+      { rotate: -5, opacity: 0.35, delay: '0.5s' },
+      { rotate: 30, opacity: 0.45, delay: '1s' },
+      { rotate: -25, opacity: 0.25, delay: '0.2s' },
+    ],
+  },
 ]
 
 const fmt = (n: number, rate: number, code: string) => {
@@ -99,182 +79,425 @@ const fmt = (n: number, rate: number, code: string) => {
 }
 
 export default function Home() {
-  const [current, setCurrent] = useState(0)
-  const [currency, setCurrency] = useState(currencies[0])
+  const router = useRouter()
+  const [slide, setSlide] = useState(0)
   const [activeBrand, setActiveBrand] = useState('Todos')
+  const [currencyOpen, setCurrencyOpen] = useState(false)
+  const [userName, setUserName] = useState<string | null>(null)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(true)
+  const { currency, setCurrency, adicionar, abrirSidebar, quantidade } = useCarrinho()
 
   useEffect(() => {
-    const t = setInterval(() => setCurrent(p => (p + 1) % slides.length), 5000)
+    getSupabaseClient().auth.getUser().then(({ data: { user } }) => {
+      if (user) setUserName(user.user_metadata?.nome || user.email?.split('@')[0] || 'Conta')
+    })
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/produtos').then(r => r.json()).then((data: Product[]) => {
+      setProducts(data)
+      setLoadingProducts(false)
+    })
+  }, [])
+
+  useEffect(() => {
+    const t = setInterval(() => setSlide(p => (p + 1) % banners.length), 5500)
     return () => clearInterval(t)
   }, [])
 
+  const b = banners[slide]
+  const brands = ['Todos', ...Array.from(new Set(products.map(p => p.brand).filter((x): x is string => Boolean(x))))]
+  const filtered = products.filter(p => activeBrand === 'Todos' || p.brand === activeBrand)
+
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white font-sans">
+    <div className="min-h-screen text-white font-sans" style={{ background: '#080808' }}>
+      <style>{`
+        @keyframes laserPulse {
+          0%, 100% { opacity: var(--op); transform: scaleX(1); }
+          50% { opacity: calc(var(--op) * 0.4); transform: scaleX(0.85); }
+        }
+        @keyframes scanline {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100vh); }
+        }
+        @keyframes neonFlicker {
+          0%, 95%, 100% { opacity: 1; }
+          96% { opacity: 0.7; }
+          98% { opacity: 0.9; }
+        }
+        @keyframes gridMove {
+          0% { background-position: 0 0; }
+          100% { background-position: 40px 40px; }
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(18px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes borderRun {
+          0% { background-position: 0% 0%; }
+          100% { background-position: 200% 0%; }
+        }
+        @keyframes productFloat {
+          0%, 100% { transform: translateY(0px) scale(1) rotate(-1deg); }
+          33% { transform: translateY(-14px) scale(1.02) rotate(0.5deg); }
+          66% { transform: translateY(-6px) scale(1.01) rotate(-0.5deg); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
+        }
+        .nav-link { position: relative; }
+        .nav-link::after {
+          content: '';
+          position: absolute;
+          bottom: -4px; left: 50%; right: 50%;
+          height: 1px;
+          background: #12fd00;
+          box-shadow: 0 0 8px #12fd00;
+          transition: left 0.25s, right 0.25s;
+        }
+        .nav-link:hover::after { left: 0; right: 0; }
+        .product-card:hover .card-img { transform: scale(1.08); }
+        .product-card:hover { border-color: rgba(18,253,0,0.35) !important; box-shadow: 0 0 24px rgba(18,253,0,0.08) !important; }
+        .skeleton { background: linear-gradient(90deg, #0e0e0e 25%, #141414 50%, #0e0e0e 75%); background-size: 400px 100%; animation: shimmer 1.4s ease-in-out infinite; }
+      `}</style>
 
-      {/* Top bar */}
-      <div className="bg-[#111] py-1.5 px-4 text-xs flex justify-between items-center border-b border-[#2a2a2a]">
-        <span className="text-gray-500">USD/BRL = 5,20 &nbsp;|&nbsp; USD/PYG = 7.680</span>
-        <div className="flex items-center gap-3">
-          {currencies.map(c => (
-            <button
-              key={c.code}
-              onClick={() => setCurrency(c)}
-              className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-all ${currency.code === c.code ? 'bg-[#12fd00]/20 text-[#12fd00]' : 'text-gray-400 hover:text-white'}`}
-            >
-              <div className="relative w-5 h-3.5 overflow-hidden rounded-sm">
-                <Image src={c.flag} alt={c.label} fill className="object-cover" unoptimized />
-              </div>
-              <span>{c.code}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* ══════════ NAVBAR FUTURISTA ══════════ */}
+      <header style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: 'rgba(6,6,6,0.92)',
+        backdropFilter: 'blur(24px)',
+        borderBottom: '1px solid rgba(18,253,0,0.2)',
+        boxShadow: '0 0 40px rgba(18,253,0,0.06), 0 1px 0 rgba(18,253,0,0.15)',
+      }}>
+        <div style={{
+          height: 2,
+          background: 'linear-gradient(90deg, transparent 0%, #12fd00 20%, #00e5ff 50%, #ff2cf7 80%, transparent 100%)',
+          backgroundSize: '200% 100%',
+          animation: 'borderRun 3s linear infinite',
+        }} />
 
-      {/* Header */}
-      <header className="bg-[#212121] sticky top-0 z-50 border-b border-[#2e2e2e]">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <Image src="/logo.png" alt="Atacado Paraguai" width={150} height={59} className="object-contain" />
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, height: 60 }}>
 
-          <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
-            <a href="#" className="px-3 py-1.5 hover:text-[#12fd00] transition-colors">Home</a>
-            <span className="text-[#333]">|</span>
-            {navCategories.map((cat, i) => (
-              <a key={cat} href="#"
-                className={`px-3 py-1.5 transition-colors hover:text-[#12fd00] ${i === 0 ? 'text-[#12fd00] font-semibold' : ''}`}>
-                {cat}
+          <Image src="/logo.png" alt="Atacado Paraguai" width={110} height={43} style={{ objectFit: 'contain' }} />
+
+          <nav style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+            {navLinks.map((l, i) => (
+              <a key={l.label} href={l.href}
+                className="nav-link"
+                style={{
+                  padding: '0 18px',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.15em',
+                  color: i === 0 ? '#12fd00' : '#aaa',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                  textShadow: i === 0 ? '0 0 12px #12fd00' : 'none',
+                  borderRight: i < navLinks.length - 1 ? '1px solid #1a1a1a' : 'none',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#12fd00'; (e.currentTarget as HTMLAnchorElement).style.textShadow = '0 0 10px #12fd00' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = i === 0 ? '#12fd00' : '#aaa'; (e.currentTarget as HTMLAnchorElement).style.textShadow = i === 0 ? '0 0 12px #12fd00' : 'none' }}>
+                {l.label}
               </a>
             ))}
           </nav>
 
-          <div className="flex items-center gap-4 text-gray-300">
-            <button className="hover:text-[#12fd00] transition-colors text-lg">🔍</button>
-            <button className="hover:text-[#12fd00] transition-colors text-lg">♡</button>
-            <button className="hover:text-[#12fd00] transition-colors flex items-center gap-1.5 text-sm">
-              🛒 <span>{currency.code} 0,00</span>
-            </button>
-            <a href="#" className="hidden md:block text-xs border border-[#444] px-3 py-1.5 rounded hover:border-[#12fd00] hover:text-[#12fd00] transition-colors">
-              Entrar
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 10, color: '#444', letterSpacing: '0.05em', fontWeight: 600 }}>USD/BRL = 5,20</span>
+
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setCurrencyOpen(p => !p)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '5px 10px', borderRadius: 6,
+                  background: 'rgba(18,253,0,0.06)',
+                  border: '1px solid rgba(18,253,0,0.25)',
+                  color: '#12fd00', fontSize: 11, fontWeight: 700,
+                  cursor: 'pointer', letterSpacing: '0.05em',
+                  boxShadow: '0 0 8px rgba(18,253,0,0.1)',
+                  transition: 'all 0.2s',
+                }}>
+                <div style={{ position: 'relative', width: 20, height: 14, overflow: 'hidden', borderRadius: 2 }}>
+                  <Image src={currency.flag} alt={currency.label} fill style={{ objectFit: 'cover' }} unoptimized />
+                </div>
+                {currency.code}
+                <svg style={{ width: 10, height: 10, transform: currencyOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {currencyOpen && (
+                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 6, background: '#0e0e0e', border: '1px solid rgba(18,253,0,0.2)', borderRadius: 8, boxShadow: '0 8px 32px rgba(0,0,0,0.8), 0 0 20px rgba(18,253,0,0.08)', zIndex: 999, minWidth: 130, overflow: 'hidden' }}>
+                  {currencies.map(c => (
+                    <button key={c.code} onClick={() => { setCurrency(c); setCurrencyOpen(false) }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '9px 14px', background: currency.code === c.code ? 'rgba(18,253,0,0.08)' : 'transparent', border: 'none', color: currency.code === c.code ? '#12fd00' : '#888', fontSize: 12, fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(18,253,0,0.05)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = currency.code === c.code ? 'rgba(18,253,0,0.08)' : 'transparent')}>
+                      <div style={{ position: 'relative', width: 20, height: 14, overflow: 'hidden', borderRadius: 2, flexShrink: 0 }}>
+                        <Image src={c.flag} alt={c.label} fill style={{ objectFit: 'cover' }} unoptimized />
+                      </div>
+                      {c.code} — {c.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <a href={userName ? '/conta/minha-conta' : '/conta/login'}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid #222', borderRadius: 8, padding: '7px 12px', color: '#888', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', textDecoration: 'none', transition: 'all 0.2s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; (e.currentTarget as HTMLAnchorElement).style.borderColor = '#333' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#888'; (e.currentTarget as HTMLAnchorElement).style.borderColor = '#222' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              {userName ? userName.split(' ')[0].toUpperCase() : 'CONTA'}
             </a>
+
+            <button onClick={abrirSidebar} style={{ position: 'relative', background: 'rgba(18,253,0,0.08)', border: '1px solid rgba(18,253,0,0.2)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, color: '#12fd00', fontSize: 12, fontWeight: 700, boxShadow: '0 0 12px rgba(18,253,0,0.08)', transition: 'all 0.2s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 20px rgba(18,253,0,0.25)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(18,253,0,0.5)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 12px rgba(18,253,0,0.08)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(18,253,0,0.2)' }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              CARRINHO
+              {quantidade > 0 && (
+                <span style={{ background: '#12fd00', color: '#000', borderRadius: 99, fontSize: 10, fontWeight: 900, padding: '0 6px', minWidth: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 8px #12fd00' }}>
+                  {quantidade}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Hero Carousel */}
-      <section className="relative h-[420px] md:h-[560px] overflow-hidden">
-        {slides.map((s, i) => (
-          <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <Image src={s.img} alt={s.title} fill className="object-cover" unoptimized />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-center px-10 md:px-24">
-              <span className="text-[#12fd00] text-xs font-bold tracking-[0.2em] uppercase mb-3">{s.tag}</span>
-              <h1 className="text-3xl md:text-5xl font-extrabold max-w-md mb-7 leading-tight drop-shadow">{s.title}</h1>
-              <a href="#" className="inline-flex items-center bg-[#12fd00] text-black font-bold px-7 py-3 rounded text-sm w-fit hover:bg-white transition-colors uppercase tracking-wide">
-                {s.cta}
-              </a>
+      {/* ══════════ HERO NEON BANNERS ══════════ */}
+      <section style={{ position: 'relative', height: 520, overflow: 'hidden' }}>
+        {banners.map((bn, idx) => (
+          <div key={idx} style={{
+            position: 'absolute', inset: 0,
+            opacity: idx === slide ? 1 : 0,
+            pointerEvents: idx === slide ? 'auto' : 'none',
+            transition: 'opacity 0.8s ease',
+            background: bn.bg,
+          }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: `linear-gradient(${bn.color}08 1px, transparent 1px), linear-gradient(90deg, ${bn.color}08 1px, transparent 1px)`,
+              backgroundSize: '40px 40px',
+              animation: 'gridMove 8s linear infinite',
+            }} />
+
+            {bn.rays.map((r, ri) => (
+              <div key={ri} style={{
+                position: 'absolute',
+                top: 0, left: '-20%', right: '-20%', height: '100%',
+                background: `linear-gradient(${r.rotate}deg, transparent 40%, ${bn.color} 50%, transparent 60%)`,
+                ['--op' as string]: r.opacity,
+                opacity: r.opacity,
+                animation: `laserPulse ${2.5 + ri * 0.7}s ease-in-out infinite`,
+                animationDelay: r.delay,
+                mixBlendMode: 'screen',
+                filter: `blur(${2 + ri}px)`,
+              }} />
+            ))}
+
+            <div style={{
+              position: 'absolute', left: 0, right: 0, height: 2,
+              background: `linear-gradient(90deg, transparent, ${bn.color}40, transparent)`,
+              animation: 'scanline 4s linear infinite',
+              animationDelay: '1s',
+            }} />
+
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: 120,
+              background: `linear-gradient(to top, ${bn.color}18, transparent)`,
+            }} />
+
+            <div style={{
+              position: 'absolute', inset: 0,
+              display: 'flex', alignItems: 'center',
+              padding: '0 56px 0 72px',
+              gap: 24,
+            }}>
+              <div style={{
+                flex: '0 0 52%',
+                display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                animation: idx === slide ? 'slideIn 0.6s ease' : 'none',
+              }}>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 14,
+                  background: `${bn.color}15`, border: `1px solid ${bn.color}40`,
+                  borderRadius: 4, padding: '4px 12px', width: 'fit-content',
+                }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: bn.color, boxShadow: `0 0 8px ${bn.color}`, animation: 'neonFlicker 3s ease infinite' }} />
+                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.2em', color: bn.color }}>{bn.tag}</span>
+                </div>
+
+                <h1 style={{ margin: 0, marginBottom: 14, lineHeight: 1.05 }}>
+                  {bn.title.map((line, li) => (
+                    <div key={li} style={{
+                      fontSize: 'clamp(26px, 3.4vw, 50px)', fontWeight: 900,
+                      letterSpacing: '-0.02em',
+                      color: li === 0 ? '#fff' : bn.color,
+                      textShadow: li === 1 ? `0 0 30px ${bn.color}, 0 0 60px ${bn.color}40` : '0 2px 20px rgba(0,0,0,0.8)',
+                      animation: 'neonFlicker 6s ease infinite',
+                      animationDelay: `${li * 0.5}s`,
+                    }}>{line}</div>
+                  ))}
+                </h1>
+
+                <p style={{ color: '#888', fontSize: 13, fontWeight: 500, marginBottom: 24, letterSpacing: '0.03em' }}>{bn.sub}</p>
+
+                <a href={bn.href}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 10,
+                    background: bn.color, color: '#000',
+                    fontWeight: 900, fontSize: 12, letterSpacing: '0.12em',
+                    padding: '12px 28px', borderRadius: 6, width: 'fit-content',
+                    textDecoration: 'none',
+                    boxShadow: `0 0 20px ${bn.color}60, 0 0 60px ${bn.color}20`,
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 0 40px ${bn.color}80, 0 0 80px ${bn.color}30` }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'none'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 0 20px ${bn.color}60, 0 0 60px ${bn.color}20` }}>
+                  {bn.cta}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+              </div>
+
+              <div style={{
+                flex: 1,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                pointerEvents: 'none',
+                animation: idx === slide ? 'slideIn 0.8s ease' : 'none',
+              }}>
+                <div style={{
+                  filter: `drop-shadow(0 0 35px ${bn.color}90) drop-shadow(0 0 70px ${bn.color}50)`,
+                  animation: 'productFloat 4s ease-in-out infinite',
+                }}>
+                  <div style={{
+                    position: 'relative', width: 230, height: 230,
+                    WebkitMaskImage: 'radial-gradient(ellipse 72% 78% at center, black 20%, transparent 100%)',
+                    maskImage: 'radial-gradient(ellipse 72% 78% at center, black 20%, transparent 100%)',
+                  }}>
+                    <Image src={bn.productImg} alt={bn.productLabel} fill style={{ objectFit: 'contain' }} unoptimized />
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center', marginTop: 10 }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: bn.color, letterSpacing: '0.12em', textTransform: 'uppercase', animation: 'neonFlicker 4s ease infinite' }}>
+                    {bn.productLabel}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ))}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-          {slides.map((_, i) => (
-            <button key={i} onClick={() => setCurrent(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-[#12fd00] w-6' : 'bg-white/30 w-2'}`} />
+
+        <div style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8, zIndex: 10 }}>
+          {banners.map((bn, i) => (
+            <button key={i} onClick={() => setSlide(i)}
+              style={{ height: 4, borderRadius: 99, border: 'none', cursor: 'pointer', transition: 'all 0.3s', background: i === slide ? bn.color : '#333', width: i === slide ? 28 : 8, boxShadow: i === slide ? `0 0 8px ${bn.color}` : 'none' }} />
           ))}
         </div>
-        <button onClick={() => setCurrent(p => (p - 1 + slides.length) % slides.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 w-10 h-10 rounded-full flex items-center justify-center text-xl transition-colors">
-          ‹
-        </button>
-        <button onClick={() => setCurrent(p => (p + 1) % slides.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 w-10 h-10 rounded-full flex items-center justify-center text-xl transition-colors">
-          ›
-        </button>
+
+        <button onClick={() => setSlide(p => (p - 1 + banners.length) % banners.length)}
+          style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: '1px solid #333', color: '#fff', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>‹</button>
+        <button onClick={() => setSlide(p => (p + 1) % banners.length)}
+          style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: '1px solid #333', color: '#fff', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>›</button>
       </section>
 
-      {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 py-14">
-        <h2 className="text-2xl font-bold mb-8 text-center">Categorias</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map(cat => (
-            <a key={cat.name} href="#"
-              className="bg-[#242424] border border-[#333] rounded-xl p-6 flex flex-col items-center gap-4 hover:border-[#12fd00] transition-colors group">
-              <div className="w-24 h-24 relative">
-                <Image src={cat.img} alt={cat.name} fill className="object-contain drop-shadow-lg" unoptimized />
-              </div>
-              <div className="text-center">
-                <div className="font-semibold group-hover:text-[#12fd00] transition-colors">{cat.name}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{cat.count} produtos</div>
-              </div>
-            </a>
-          ))}
-        </div>
-      </section>
+      {/* ══════════ PRODUTOS SAÚDE ══════════ */}
+      <section id="saude" style={{ maxWidth: 1280, margin: '0 auto', padding: '60px 24px 80px' }}>
 
-      {/* Products */}
-      <section className="max-w-7xl mx-auto px-4 pb-20">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold">Em Destaque</h2>
-          <a href="#" className="text-sm text-[#12fd00] hover:underline">Ver todos →</a>
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <div style={{ width: 3, height: 28, background: '#12fd00', borderRadius: 99, boxShadow: '0 0 10px #12fd00' }} />
+            <h2 style={{ margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: '-0.02em' }}>SAÚDE</h2>
+            <span style={{ background: 'rgba(18,253,0,0.12)', border: '1px solid rgba(18,253,0,0.3)', color: '#12fd00', fontSize: 10, fontWeight: 800, padding: '3px 10px', borderRadius: 4, letterSpacing: '0.1em' }}>
+              {loadingProducts ? '...' : `${products.length} PRODUTOS`}
+            </span>
+          </div>
+          <p style={{ color: '#555', fontSize: 13, margin: 0 }}>Peptídeos importados · Estoque limitado · Preços em USD</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-          {products.map((p, i) => (
-            <div key={i} className="bg-[#242424] border border-[#333] rounded-xl overflow-hidden hover:border-[#12fd00] transition-colors group">
-              <div className="relative h-52 bg-[#1e1e1e]">
-                <Image src={p.img} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
-                <button className="absolute top-3 right-3 text-gray-400 hover:text-[#12fd00] bg-black/50 rounded-full w-8 h-8 flex items-center justify-center">♡</button>
-                <span className="absolute top-3 left-3 bg-[#12fd00] text-black text-[10px] font-bold px-2 py-0.5 rounded">Em estoque</span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-sm font-medium mb-3 line-clamp-2 leading-snug">{p.name}</h3>
-                <div className="mb-4">
-                  <div className="text-[#12fd00] font-bold text-lg">{currency.code} {fmt(p.usd, currency.rate, currency.code)}</div>
-                  <div className="text-xs text-gray-500">USD {p.usd.toFixed(2).replace('.', ',')}</div>
-                </div>
-                {p.variants && <p className="text-[10px] text-gray-600 mb-3">Possui variantes — escolha na página do produto</p>}
-                <button className="w-full bg-[#0b7f02] hover:bg-[#12fd00] hover:text-black text-white text-xs font-bold py-2.5 rounded transition-colors uppercase tracking-wide">
-                  Adicionar ao Carrinho
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Saúde */}
-      <section id="peptideos" className="max-w-7xl mx-auto px-4 pb-20">
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="text-2xl font-bold">Saúde</h2>
-          <span className="bg-[#12fd00] text-black text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">Atacado</span>
-        </div>
-        <p className="text-sm text-gray-500 mb-6">Stock limitado · Consultar disponibilidade · Venda em atacado</p>
-
-        {/* Brand filter */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {brands.map(b => (
-            <button key={b} onClick={() => setActiveBrand(b)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${activeBrand === b ? 'bg-[#12fd00] text-black border-[#12fd00]' : 'border-[#333] text-gray-400 hover:border-[#12fd00] hover:text-white'}`}>
-              {b}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
+          {brands.map(br => (
+            <button key={br} onClick={() => setActiveBrand(br)}
+              style={{
+                padding: '6px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em',
+                borderRadius: 4, border: `1px solid ${activeBrand === br ? '#12fd00' : '#222'}`,
+                background: activeBrand === br ? 'rgba(18,253,0,0.12)' : 'transparent',
+                color: activeBrand === br ? '#12fd00' : '#555',
+                cursor: 'pointer', transition: 'all 0.15s',
+                boxShadow: activeBrand === br ? '0 0 12px rgba(18,253,0,0.15)' : 'none',
+              }}>
+              {br}
             </button>
           ))}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {peptideos.filter(p => activeBrand === 'Todos' || p.brand === activeBrand).map((p, i) => (
-            <div key={i} className="bg-[#242424] border border-[#333] rounded-xl overflow-hidden hover:border-[#12fd00] transition-colors group">
-              <div className="relative h-40 bg-[#1a1a1a]">
-                <Image src={p.img} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
+          {loadingProducts ? (
+            Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="skeleton" style={{ borderRadius: 12, height: 280 }} />
+            ))
+          ) : filtered.map(p => (
+            <div key={p.id} className="product-card"
+              style={{
+                background: '#0e0e0e', border: '1px solid #1a1a1a', borderRadius: 12,
+                overflow: 'hidden', transition: 'all 0.25s', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column',
+                opacity: p.estoque === 0 ? 0.6 : 1,
+              }}>
+
+              {/* Imagem — clique vai para página do produto */}
+              <div
+                onClick={() => router.push(`/produtos/${p.id}`)}
+                style={{ position: 'relative', height: 160, background: '#111', overflow: 'hidden' }}>
+                <Image src={p.img_url} alt={p.name} fill className="card-img" style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }} unoptimized />
                 {p.brand && (
-                  <span className="absolute top-2 left-2 bg-[#2a2a2a] border border-[#444] text-[10px] text-gray-400 px-2 py-0.5 rounded">{p.brand}</span>
+                  <span style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', border: '1px solid #2a2a2a', color: '#777', fontSize: 9, fontWeight: 700, padding: '3px 7px', borderRadius: 3, letterSpacing: '0.05em' }}>
+                    {p.brand.toUpperCase()}
+                  </span>
                 )}
-                <button className="absolute top-2 right-2 text-gray-500 hover:text-[#12fd00] bg-black/50 rounded-full w-7 h-7 flex items-center justify-center text-sm">♡</button>
+                {p.estoque !== null && p.estoque <= 5 && p.estoque > 0 && (
+                  <span style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(245,158,11,0.9)', color: '#000', fontSize: 9, fontWeight: 800, padding: '3px 7px', borderRadius: 3 }}>
+                    ÚLT. {p.estoque}
+                  </span>
+                )}
+                {p.estoque === 0 && (
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#ef4444', border: '1px solid rgba(239,68,68,0.4)', padding: '4px 10px', borderRadius: 4, background: 'rgba(0,0,0,0.6)' }}>SEM ESTOQUE</span>
+                  </div>
+                )}
               </div>
-              <div className="p-3">
-                <h3 className="text-xs font-medium mb-3 line-clamp-2 leading-snug">{p.name}</h3>
-                <div className="mb-3">
-                  <div className="text-[#12fd00] font-bold">{currency.code} {fmt(p.usd, currency.rate, currency.code)}</div>
-                  <div className="text-[10px] text-gray-500">USD {p.usd.toFixed(2).replace('.', ',')}</div>
+
+              <div style={{ padding: '12px 12px 14px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <h3
+                  onClick={() => router.push(`/produtos/${p.id}`)}
+                  style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 600, color: '#ccc', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden', cursor: 'pointer' }}>
+                  {p.name}
+                </h3>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: '#12fd00', textShadow: '0 0 8px rgba(18,253,0,0.3)' }}>
+                    {currency.code} {fmt(p.usd_price, currency.rate, currency.code)}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#444', marginTop: 2 }}>USD {p.usd_price.toFixed(2)}</div>
                 </div>
-                <button className="w-full bg-[#0b7f02] hover:bg-[#12fd00] hover:text-black text-white text-[10px] font-bold py-2 rounded transition-colors uppercase tracking-wide">
-                  Consultar / Comprar
+                <button
+                  disabled={p.estoque === 0}
+                  onClick={() => adicionar({ id: p.id, name: p.name, usd: p.usd_price, img: p.img_url, brand: p.brand ?? undefined })}
+                  style={{
+                    marginTop: 'auto', width: '100%', padding: '9px 0', borderRadius: 6,
+                    background: p.estoque === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(18,253,0,0.08)',
+                    border: `1px solid ${p.estoque === 0 ? '#1a1a1a' : 'rgba(18,253,0,0.2)'}`,
+                    color: p.estoque === 0 ? '#333' : '#12fd00',
+                    fontSize: 10, fontWeight: 800, letterSpacing: '0.08em',
+                    cursor: p.estoque === 0 ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => { if (p.estoque !== 0) { (e.currentTarget as HTMLButtonElement).style.background = '#12fd00'; (e.currentTarget as HTMLButtonElement).style.color = '#000'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 16px rgba(18,253,0,0.35)' } }}
+                  onMouseLeave={e => { if (p.estoque !== 0) { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(18,253,0,0.08)'; (e.currentTarget as HTMLButtonElement).style.color = '#12fd00'; (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none' } }}>
+                  {p.estoque === 0 ? 'INDISPONÍVEL' : '+ ADICIONAR'}
                 </button>
               </div>
             </div>
@@ -282,39 +505,41 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WhatsApp */}
-      <a href="https://wa.me/595" target="_blank" rel="noopener"
-        className="fixed bottom-6 right-6 bg-[#25d366] rounded-full p-3.5 shadow-2xl hover:scale-110 transition-transform z-50">
-        <svg className="w-7 h-7 fill-white" viewBox="0 0 24 24">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+      {/* WhatsApp FAB */}
+      <a href="https://wa.me/595984522822" target="_blank" rel="noopener"
+        style={{ position: 'fixed', bottom: 24, right: 24, width: 52, height: 52, borderRadius: '50%', background: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', zIndex: 50, transition: 'transform 0.2s' }}
+        onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.1)'}
+        onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.transform = 'none'}>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
         </svg>
       </a>
 
       {/* Footer */}
-      <footer className="bg-[#111] border-t border-[#222] py-12 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
+      <footer style={{ background: '#060606', borderTop: '1px solid #111', padding: '48px 24px 24px' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 40 }}>
           <div>
-            <Image src="/logo-light.png" alt="Atacado Paraguai" width={160} height={63} className="object-contain mb-4" />
-            <p className="text-sm text-gray-500 leading-relaxed">Atacado e varejo. Compre e retire na loja em Paraguai.</p>
+            <Image src="/logo.png" alt="Atacado Paraguai" width={120} height={47} style={{ objectFit: 'contain', marginBottom: 12 }} />
+            <p style={{ color: '#444', fontSize: 13, lineHeight: 1.6 }}>Atacado e varejo. Compre e retire na loja em Paraguai.</p>
           </div>
           <div>
-            <h4 className="font-bold mb-4 text-[#12fd00] text-sm tracking-wide uppercase">Loja</h4>
-            <ul className="space-y-2 text-sm text-gray-500">
-              {['PODS', 'Perfumes Árabes', 'Líquidos', 'Acessórios', 'VER TUDO'].map(i => (
-                <li key={i}><a href="#" className="hover:text-white transition-colors">{i}</a></li>
+            <h4 style={{ color: '#12fd00', fontSize: 11, fontWeight: 800, letterSpacing: '0.15em', marginBottom: 16, textShadow: '0 0 8px rgba(18,253,0,0.4)' }}>CATÁLOGO</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {['Biogenesis', 'ZPHC', 'Thera Genetics', 'Lipoless', 'Cooper Pharma'].map(i => (
+                <li key={i}><a href="#saude" style={{ color: '#555', fontSize: 13, textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = '#12fd00'} onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = '#555'}>{i}</a></li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="font-bold mb-4 text-[#12fd00] text-sm tracking-wide uppercase">Contato</h4>
-            <ul className="space-y-3 text-sm text-gray-500">
-              <li>📍 Paraguai</li>
-              <li>💬 <a href="https://wa.me/595" className="hover:text-white transition-colors">WhatsApp</a></li>
+            <h4 style={{ color: '#12fd00', fontSize: 11, fontWeight: 800, letterSpacing: '0.15em', marginBottom: 16, textShadow: '0 0 8px rgba(18,253,0,0.4)' }}>CONTATO</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <li style={{ color: '#555', fontSize: 13 }}>📍 Paraguai</li>
+              <li><a href="https://wa.me/595984522822" style={{ color: '#555', fontSize: 13, textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = '#25d366'} onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = '#555'}>💬 WhatsApp</a></li>
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-10 pt-6 border-t border-[#222] text-center text-xs text-gray-700">
-          © 2025 Atacado PY. Todos os direitos reservados.
+        <div style={{ maxWidth: 1280, margin: '40px auto 0', paddingTop: 20, borderTop: '1px solid #111', textAlign: 'center', color: '#2a2a2a', fontSize: 11, letterSpacing: '0.05em' }}>
+          © 2025 ATACADO PARAGUAI — TODOS OS DIREITOS RESERVADOS
         </div>
       </footer>
     </div>

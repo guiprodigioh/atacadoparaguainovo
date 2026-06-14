@@ -1,0 +1,48 @@
+name: Supabase Backup Semanal
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'  # domingo às 3h UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Export Supabase data
+        run: |
+          mkdir -p backups
+          DATE=$(date +%Y-%m-%d)
+
+          curl -s "$SUPABASE_URL/rest/v1/products?select=*&ativo=eq.true" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -o "backups/products_${DATE}.json"
+
+          curl -s "$SUPABASE_URL/rest/v1/orders?select=*&limit=1000&order=created_at.desc" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -o "backups/orders_${DATE}.json"
+
+          curl -s "$SUPABASE_URL/rest/v1/clients?select=id,email,name,created_at" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -o "backups/clients_${DATE}.json"
+
+          echo "Backup $DATE" >> backups/log.txt
+          wc -c backups/*_${DATE}.json >> backups/log.txt
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Commit backup
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "Backup Bot"
+          git add backups/
+          git diff --staged --quiet || git commit -m "backup: $(date +%Y-%m-%d)"
+          git push
