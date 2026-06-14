@@ -6,6 +6,8 @@ import { useCarrinho, currencies } from '@/components/CarrinhoContext'
 
 type Product = { id: string; name: string; brand: string | null; usd_price: number; img_url: string; estoque: number | null }
 
+const dec = (s: string | null) => { try { return s ? atob(s) : null } catch { return s } }
+
 const fmt = (n: number, rate: number, code: string) => {
   if (code === 'PYG') return n > 0 ? (n * rate).toLocaleString('es-PY', { maximumFractionDigits: 0 }) : '0'
   return (n * rate).toFixed(2).replace('.', ',')
@@ -27,13 +29,17 @@ export default function ProdutoPage() {
     setLoading(true)
     const res = await fetch(`/api/produtos/${params.id}`)
     if (!res.ok) { router.replace('/'); return }
-    const data: Product = await res.json()
+    const raw: Product = await res.json()
+    const data = { ...raw, name: dec(raw.name) ?? raw.name, brand: dec(raw.brand) }
     setProduct(data)
     setLoading(false)
 
     if (data.brand) {
       const all = await fetch('/api/produtos').then(r => r.json()) as Product[]
-      setRelated(all.filter(p => p.brand === data.brand && p.id !== data.id).slice(0, 4))
+      setRelated(all
+        .map((p: Product) => ({ ...p, name: dec(p.name) ?? p.name, brand: dec(p.brand) }))
+        .filter((p: Product) => p.brand === data.brand && p.id !== data.id)
+        .slice(0, 4))
     }
   }, [params.id, router])
 

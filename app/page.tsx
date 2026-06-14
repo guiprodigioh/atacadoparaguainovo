@@ -72,6 +72,8 @@ const banners = [
   },
 ]
 
+const dec = (s: string | null) => { try { return s ? atob(s) : null } catch { return s } }
+
 const fmt = (n: number, rate: number, code: string) => {
   const v = n * rate
   if (code === 'PYG') return v.toLocaleString('es-PY', { maximumFractionDigits: 0 })
@@ -96,7 +98,7 @@ export default function Home() {
 
   useEffect(() => {
     fetch('/api/produtos').then(r => r.json()).then((data: Product[]) => {
-      setProducts(data)
+      setProducts(data.map(p => ({ ...p, name: dec(p.name) ?? p.name, brand: dec(p.brand) })))
       setLoadingProducts(false)
     })
   }, [])
