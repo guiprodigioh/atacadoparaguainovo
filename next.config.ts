@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "xjmapfpfgwoivlsalltb.supabase.co" },
       { protocol: "https", hostname: "flagcdn.com" },
     ],
+    minimumCacheTTL: 31536000,
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 828, 1080, 1200],
+    imageSizes: [64, 128, 256, 384],
   },
 };
 
